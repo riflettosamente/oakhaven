@@ -1726,6 +1726,7 @@ export default function App() {
                   setTimeout(() => setNotification(null), 3000);
                 }
               }}
+              onExitGame={resetGame}
             />
           )}
 

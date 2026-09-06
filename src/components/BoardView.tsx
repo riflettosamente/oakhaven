@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, Landmark, X } from 'lucide-react';
 import { 
@@ -12,6 +12,7 @@ import {
   PixelCoins 
 } from './PixelIcon';
 import { Quest, PlayerState, GameState } from '../types';
+import { ExitConfirmModal } from './ExitConfirmModal';
 
 interface BoardViewProps {
   player: PlayerState;
@@ -20,6 +21,7 @@ interface BoardViewProps {
   onNavigate: (state: GameState) => void;
   onOpenDeparture: (quest: Quest) => void;
   onOpenDepartureDirect: () => void;
+  onExitGame?: () => void;
 }
 
 export const BoardView: React.FC<BoardViewProps> = ({
@@ -28,8 +30,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
   currentTip,
   onNavigate,
   onOpenDeparture,
-  onOpenDepartureDirect
+  onOpenDepartureDirect,
+  onExitGame
 }) => {
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   return (
     <motion.div 
       key="state-board"
@@ -91,7 +95,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
             <Landmark size={20} className="text-amber-700" />
           </button>
           <button 
-            onClick={() => onNavigate('START')} 
+            onClick={() => setShowExitConfirm(true)} 
             className="px-4 py-2.5 bg-white hover:bg-rose-50 text-stone-700 hover:text-rose-700 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-rose-200 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
           >
             <span className="text-[10px] text-stone-500">Esci</span>
@@ -174,6 +178,19 @@ export const BoardView: React.FC<BoardViewProps> = ({
       <p className="text-xs text-stone-500 font-medium italic text-center py-2">
         Suggerimento: {currentTip}
       </p>
+
+      <ExitConfirmModal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        onConfirmExit={() => {
+          setShowExitConfirm(false);
+          if (onExitGame) {
+            onExitGame();
+          } else {
+            onNavigate('START');
+          }
+        }}
+      />
     </motion.div>
   );
 };

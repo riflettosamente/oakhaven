@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { X, Landmark, ChevronRight, Heart } from 'lucide-react';
-import { PixelCrate, PixelCoins, PixelBlacksmith, PixelStore, PixelGuild, PixelTavern } from './PixelIcon';
+import { PixelCrate, PixelBlacksmith, PixelStore, PixelGuild, PixelTavern } from './PixelIcon';
 import { Quest, PlayerState, GameState } from '../types';
 
 interface DepartureModalProps {
@@ -119,6 +119,18 @@ export const DepartureModal: React.FC<DepartureModalProps> = ({
                     ? 'Hai le merci necessarie per portare a termine con successo l\'incarico.' 
                     : `Ti mancano ${quest.goods - player.goods} casse. Puoi acquistarne all'Emporio prima di partire.`}
                 </p>
+                <div className="mt-2.5">
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onNavigate('EMPORIO');
+                    }}
+                    className="px-3 py-1.5 bg-white hover:bg-amber-50 text-stone-800 font-bold rounded-xl border border-stone-200 hover:border-amber-300 text-xs flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <PixelStore size={16} className="text-amber-600" />
+                    <span>Vai all'Emporio</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -164,52 +176,23 @@ export const DepartureModal: React.FC<DepartureModalProps> = ({
                     ? 'Il carretto è integro e pronto al viaggio.' 
                     : 'Il carretto è danneggiato. Considera di farlo riparare dal Fabbro prima di metterti in strada!'}
                 </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Domanda 3: Oro per Fabbro o Emporio */}
-          <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-200">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-                <PixelCoins size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wide text-stone-900 leading-snug">
-                  Hai ancora <span className="text-amber-800 font-black">{player.gold} Oro</span> che puoi usare, vuoi migliorare il carretto dal fabbro? Oppure acquistare qualcosa all'emporio?
-                </p>
-                <p className="text-[11px] text-stone-500 mt-0.5 mb-2.5 font-medium">
-                  Puoi spendere l'oro disponibile per riparare o potenziare il carretto, oppure rifornirti di merci e provviste.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="mt-2.5">
                   <button
                     onClick={() => {
                       onClose();
                       onNavigate('BLACKSMITH');
                     }}
-                    className="px-3 py-2 bg-white hover:bg-sky-50 text-stone-800 font-bold rounded-xl border border-stone-200 hover:border-sky-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="px-3 py-1.5 bg-white hover:bg-sky-50 text-stone-800 font-bold rounded-xl border border-stone-200 hover:border-sky-300 text-xs flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     <PixelBlacksmith size={16} className="text-sky-600" />
-                    <span>Migliora dal Fabbro</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onNavigate('EMPORIO');
-                    }}
-                    className="px-3 py-2 bg-white hover:bg-amber-50 text-stone-800 font-bold rounded-xl border border-stone-200 hover:border-amber-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
-                  >
-                    <PixelStore size={16} className="text-amber-600" />
-                    <span>Acquista all'Emporio</span>
+                    <span>Vai al Fabbro</span>
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Domanda 4: Punti Reputazione e Gilda */}
+          {/* Domanda 3: Punti Reputazione e Gilda */}
           <div className="p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-200">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-xl bg-indigo-100 border border-indigo-200 text-indigo-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -223,27 +206,46 @@ export const DepartureModal: React.FC<DepartureModalProps> = ({
                   Consulta il tuo rango di mercante, i traguardi raggiunti e i privilegi commerciali sbloccati.
                 </p>
 
-                <div className="flex flex-wrap gap-2">
+                <div>
                   <button
                     onClick={() => {
                       onClose();
                       onNavigate('GUILD');
                     }}
-                    className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-indigo-50 text-indigo-950 font-bold rounded-xl border border-indigo-200 hover:border-indigo-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-indigo-50 text-indigo-950 font-bold rounded-xl border border-indigo-200 hover:border-indigo-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95 uppercase"
                   >
                     <PixelGuild size={16} className="text-indigo-600" />
-                    <span>Vai alla Gilda</span>
+                    <span>VAI ALLA GILDA</span>
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          {/* Domanda 4: Riposo in Taverna */}
+          <div className="p-3.5 rounded-2xl bg-amber-50/40 border border-amber-200">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                <PixelTavern size={18} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wide text-stone-900 leading-snug">
+                  Puoi anche riposare alla Taverna
+                </p>
+                <p className="text-[11px] text-stone-500 mt-0.5 mb-2.5 font-medium">
+                  Ascolta le voci dei viandanti, recupera le forze o raccogli utili consigli prima di partire.
+                </p>
+
+                <div>
                   <button
                     onClick={() => {
                       onClose();
                       onNavigate('TAVERN');
                     }}
-                    className="w-full sm:w-auto px-3.5 py-2 bg-white hover:bg-amber-50 text-stone-700 font-semibold rounded-xl border border-stone-200 hover:border-amber-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-amber-50 text-stone-800 font-bold rounded-xl border border-stone-200 hover:border-amber-300 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95 uppercase"
                   >
                     <PixelTavern size={16} className="text-amber-700" />
-                    <span>Riposa in Taverna</span>
+                    <span>VAI ALLA TAVERNA</span>
                   </button>
                 </div>
               </div>
