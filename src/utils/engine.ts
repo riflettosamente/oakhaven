@@ -350,7 +350,7 @@ export const calculateStepEffects = (
     destination: currentQuest.destination,
     weather,
     terrain,
-    weatherReport: { ...weatherReport, desc: weather.desc },
+    weatherReport: { ...weatherReport, desc: weather.desc, goodsLost: goodsLostWeather, motivation: weather.name },
     terrainReport: { ...terrainReport },
     structureData: structure,
     event: event.name !== 'Nessun Evento' ? `${event.name}: ${event.description}` : "",

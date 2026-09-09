@@ -12,6 +12,8 @@ export type GameState =
   | 'BLACKSMITH' 
   | 'TAVERN' 
   | 'JOURNAL' 
+  | 'GATES'
+  | 'EXIT'
   | 'MANUAL';
 
 export interface PlayerStats {
@@ -121,6 +123,8 @@ export interface WeatherReport {
   days: number;
   mitigation: string[];
   desc?: string;
+  goodsLost?: number;
+  motivation?: string;
 }
 
 export interface TerrainReport {

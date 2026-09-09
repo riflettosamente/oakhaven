@@ -1,6 +1,8 @@
 {
-  "name": "Il Mercante di Oakhaven",
+  "name": "Il Mercante di Oakhaven V2",
   "description": "Gestisci il tuo carretto, affronta le intemperie e scala i ranghi della gilda dei mercanti.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

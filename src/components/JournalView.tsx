@@ -8,14 +8,13 @@ interface JournalViewProps {
   player: PlayerState;
   selectedJournalQuest: JournalEntry | null;
   setSelectedJournalQuest: (entry: JournalEntry | null) => void;
-  onNavigate: (state: GameState) => void;
+  onNavigate?: (state: GameState) => void;
 }
 
 export const JournalView: React.FC<JournalViewProps> = ({
   player,
   selectedJournalQuest,
-  setSelectedJournalQuest,
-  onNavigate
+  setSelectedJournalQuest
 }) => {
   return (
     <motion.div 
@@ -35,12 +34,6 @@ export const JournalView: React.FC<JournalViewProps> = ({
             <p className="text-stone-400 font-semibold uppercase text-xs tracking-wider">Cronache delle carovane commerciali</p>
           </div>
         </div>
-        <button 
-          onClick={() => { onNavigate('BOARD'); setSelectedJournalQuest(null); }}
-          className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl transition-all text-xs font-bold uppercase flex items-center gap-2 border border-stone-300 cursor-pointer"
-        >
-          <ArrowLeft size={16} /> Torna alla Bacheca
-        </button>
       </div>
 
       <div className="flex-1 flex overflow-hidden">

@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { ChevronRight, Landmark, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { 
   PixelQuest, 
-  PixelStore, 
-  PixelBlacksmith, 
-  PixelTavern, 
-  PixelGuild, 
-  PixelBook, 
   PixelCrate, 
   PixelCoins 
 } from './PixelIcon';
 import { Quest, PlayerState, GameState } from '../types';
-import { ExitConfirmModal } from './ExitConfirmModal';
 
 interface BoardViewProps {
   player: PlayerState;
   questOptions: Quest[];
   currentTip: string;
-  onNavigate: (state: GameState) => void;
+  onNavigate?: (state: GameState) => void;
   onOpenDeparture: (quest: Quest) => void;
-  onOpenDepartureDirect: () => void;
+  onOpenDepartureDirect?: () => void;
   onExitGame?: () => void;
 }
 
@@ -28,12 +22,8 @@ export const BoardView: React.FC<BoardViewProps> = ({
   player,
   questOptions,
   currentTip,
-  onNavigate,
-  onOpenDeparture,
-  onOpenDepartureDirect,
-  onExitGame
+  onOpenDeparture
 }) => {
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
   return (
     <motion.div 
       key="state-board"
@@ -42,65 +32,19 @@ export const BoardView: React.FC<BoardViewProps> = ({
       exit={{ opacity: 0, y: -15 }}
       className="max-w-5xl w-full mx-auto space-y-8 pb-12"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-stone-200 pb-6">
-        <div>
-          <h2 className="text-stone-500 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-            <PixelQuest size={16} className="text-amber-600" /> Sede di {player.currentLocation}
-          </h2>
-          <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-stone-900">
-            Bacheca degli Incarichi
-          </h1>
-        </div>
-        <div className="flex flex-wrap gap-2.5">
-          <button 
-            onClick={() => onNavigate('EMPORIO')} 
-            className="px-4 py-2.5 bg-white hover:bg-amber-50 text-stone-800 hover:text-amber-900 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-amber-300 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Emporio</span>
-            <PixelStore size={20} className="text-amber-600" />
-          </button>
-          <button 
-            onClick={() => onNavigate('BLACKSMITH')} 
-            className="px-4 py-2.5 bg-white hover:bg-sky-50 text-stone-800 hover:text-sky-900 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-sky-300 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Fabbro</span>
-            <PixelBlacksmith size={20} className="text-sky-600" />
-          </button>
-          <button 
-            onClick={() => onNavigate('TAVERN')} 
-            className="px-4 py-2.5 bg-white hover:bg-amber-50 text-stone-800 hover:text-amber-900 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-amber-300 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Taverna</span>
-            <PixelTavern size={20} className="text-amber-700" />
-          </button>
-          <button 
-            onClick={() => onNavigate('GUILD')} 
-            className="px-4 py-2.5 bg-white hover:bg-indigo-50 text-stone-800 hover:text-indigo-900 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-indigo-300 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Gilda</span>
-            <PixelGuild size={20} className="text-indigo-600" />
-          </button>
-          <button 
-            onClick={() => onNavigate('JOURNAL')} 
-            className="px-4 py-2.5 bg-white hover:bg-stone-50 text-stone-800 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Diario</span>
-            <PixelBook size={20} className="text-stone-700" />
-          </button>
-          <button 
-            onClick={onOpenDepartureDirect} 
-            className="px-4 py-2.5 bg-white hover:bg-amber-50 text-stone-800 hover:text-amber-900 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-amber-300 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Porte della Città</span>
-            <Landmark size={20} className="text-amber-700" />
-          </button>
-          <button 
-            onClick={() => setShowExitConfirm(true)} 
-            className="px-4 py-2.5 bg-white hover:bg-rose-50 text-stone-700 hover:text-rose-700 font-bold uppercase text-xs tracking-wider rounded-xl border border-stone-200 hover:border-rose-200 shadow-xs flex flex-col items-center gap-1 transition-all cursor-pointer"
-          >
-            <span className="text-[10px] text-stone-500">Esci</span>
-            <X size={20} />
-          </button>
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-amber-500 text-white rounded-2xl shadow-sm">
+            <PixelQuest size={28} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold uppercase text-stone-900 leading-tight">
+              Bacheca degli Incarichi
+            </h1>
+            <p className="text-stone-400 font-semibold uppercase text-xs tracking-wider mt-0.5">
+              Sede commerciale di {player.currentLocation} • Seleziona una spedizione
+            </p>
+          </div>
         </div>
       </div>
 
@@ -178,19 +122,6 @@ export const BoardView: React.FC<BoardViewProps> = ({
       <p className="text-xs text-stone-500 font-medium italic text-center py-2">
         Suggerimento: {currentTip}
       </p>
-
-      <ExitConfirmModal
-        isOpen={showExitConfirm}
-        onClose={() => setShowExitConfirm(false)}
-        onConfirmExit={() => {
-          setShowExitConfirm(false);
-          if (onExitGame) {
-            onExitGame();
-          } else {
-            onNavigate('START');
-          }
-        }}
-      />
     </motion.div>
   );
 };

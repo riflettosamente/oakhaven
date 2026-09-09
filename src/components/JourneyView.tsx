@@ -383,6 +383,12 @@ export function JourneyView({
                             </span>
                           </div>
 
+                          {(stepData.goodsLostWeather > 0 || (stepData.weatherReport?.goodsLost || 0) > 0) && (
+                            <div className="mt-2 text-[10px] text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-1.5 font-medium flex items-center gap-1.5">
+                              📦 <span>Perdita Merci: -{stepData.goodsLostWeather || stepData.weatherReport?.goodsLost} ({stepData.weather?.name})</span>
+                            </div>
+                          )}
+
                           {stepData.weatherReport?.mitigation && stepData.weatherReport.mitigation.length > 0 && (
                             <div className="mt-2 text-[10px] text-sky-800 bg-sky-50 border border-sky-200 rounded-lg p-1.5 font-medium flex items-center gap-1.5">
                               <ShieldCheck size={13} className="shrink-0 text-sky-600" />
@@ -497,9 +503,9 @@ export function JourneyView({
                           <div className="text-xs text-amber-950 bg-amber-50 border border-amber-200 rounded-xl p-2 font-semibold leading-relaxed">
                             {stepData.eventReport?.outcome || (stepData.detailedDamage?.event ? `Danni evento: -${stepData.detailedDamage.event} HP` : 'Nessun danno o perdita di merci.')}
                           </div>
-                          {stepData.goodsLost > 0 && stepData.goodsLossNote && (
+                          {stepData.goodsLostEvent > 0 && (
                             <div className="mt-2 text-[10px] text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-1.5 font-medium">
-                              📦 {stepData.goodsLossNote}
+                              📦 Perdita Merci: -{stepData.goodsLostEvent} ({stepData.eventData?.name || 'Evento'})
                             </div>
                           )}
                         </div>
@@ -933,6 +939,11 @@ export function JourneyView({
                               +{stepItem.weatherReport?.days || 0} GG
                             </span>
                           </div>
+                          {(stepItem.goodsLostWeather > 0 || (stepItem.weatherReport?.goodsLost || 0) > 0) && (
+                            <div className="text-[10px] text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-1.5 font-bold leading-tight">
+                              📦 Persa {stepItem.goodsLostWeather || stepItem.weatherReport?.goodsLost} merce ({stepItem.weather?.name})
+                            </div>
+                          )}
                           {stepItem.weatherReport?.mitigation && stepItem.weatherReport.mitigation.length > 0 && (
                             <div className="text-[10px] text-sky-900 bg-sky-100/80 border border-sky-200 rounded-lg p-1.5 font-medium leading-tight">
                               🛡️ {stepItem.weatherReport.mitigation.join(' • ')}
@@ -1209,9 +1220,9 @@ export function JourneyView({
                             <div className="text-xs text-stone-900 bg-white/90 border border-amber-200 rounded-xl p-2.5 font-semibold leading-relaxed">
                               {stepItem.eventReport?.outcome || (stepItem.eventData?.name === 'Nessun Evento' ? 'Tragitto trascorso in totale serenità.' : stepItem.eventData?.description)}
                             </div>
-                            {stepItem.goodsLost > 0 && stepItem.goodsLossNote && (
+                            {stepItem.goodsLostEvent > 0 && (
                               <div className="text-[10px] text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-1.5 font-bold">
-                                📦 {stepItem.goodsLossNote}
+                                📦 Persa {stepItem.goodsLostEvent} merce ({stepItem.eventData?.name || 'Evento'})
                               </div>
                             )}
                           </div>

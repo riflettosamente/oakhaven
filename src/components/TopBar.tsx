@@ -25,6 +25,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   setItemDetail,
   useRepairKit
 }) => {
+  const isMechanic = player.badges?.includes('meccanico_esperto');
+  const healAmount = isMechanic ? 10 : 5;
+  const hasLantern = player.upgrades.includes('lantern');
   return (
     <div className="w-full bg-white/95 border-b border-stone-200 px-4 py-2 lg:px-6 flex flex-col lg:flex-row gap-4 items-center select-none font-sans sticky top-0 z-40 backdrop-blur-sm shadow-xs">
       <div className="flex items-center gap-3 shrink-0">
@@ -85,7 +88,22 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       <div className="flex-1 flex flex-col xl:flex-row gap-4 w-full items-center">
-        <div className="flex-1 w-full max-w-md">
+        <button
+          onClick={() => setItemDetail(itemDetail?.id === 'stat-hp' ? null : {
+            id: 'stat-hp',
+            name: 'Integrità Carretto',
+            description: 'Rappresenta la salute strutturale del tuo carretto. Se scende a 0 HP la spedizione fallisce. Riparalo usando i Kit di Riparazione o dal Fabbro in città.',
+            category: 'stat',
+            icon: Truck,
+            color: 'text-amber-600'
+          })}
+          className={`flex-1 w-full max-w-md p-1.5 rounded-xl text-left transition-all cursor-pointer ${
+            itemDetail?.id === 'stat-hp' 
+              ? 'bg-amber-50/70 ring-1 ring-amber-300' 
+              : 'hover:bg-stone-50'
+          }`}
+          title="Dettagli Integrità Carretto"
+        >
           <div className="flex justify-between items-center mb-1 px-1">
             <span className="flex items-center gap-1.5 text-stone-500 text-[10px] font-bold uppercase tracking-wider">
               <Truck size={14} className="text-amber-600" /> Integrità Carretto
@@ -111,7 +129,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               );
             })}
           </div>
-        </div>
+        </button>
 
         <div className="flex gap-4 shrink-0 bg-stone-50 p-1.5 px-3 rounded-xl border border-stone-200">
           <button 
@@ -211,15 +229,83 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       <div className="flex gap-2 shrink-0 lg:ml-auto">
-        <button 
-          disabled={player.consumables.repairKits === 0 || player.hp >= player.hpMax}
-          onClick={useRepairKit}
-          className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-stone-50 disabled:opacity-40 transition-all rounded-lg text-xs font-bold border border-stone-200 text-stone-800 shadow-xs cursor-pointer"
-        >
-          <Wrench size={16} className="text-amber-600"/> Ripara ({player.consumables.repairKits})
-        </button>
-        <div className={`flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs font-bold border border-stone-200 shadow-xs transition-colors ${player.consumables.lanternOil === 0 ? 'text-rose-600 border-rose-200' : 'text-sky-700'}`}>
-          <FlameKindling size={16} /> Olio ({player.consumables.lanternOil})
+        <div className="relative group">
+          <button 
+            disabled={player.consumables.repairKits === 0 || player.hp >= player.hpMax}
+            onClick={useRepairKit}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-stone-50 disabled:opacity-40 transition-all rounded-lg text-xs font-bold border border-stone-200 text-stone-800 shadow-xs cursor-pointer"
+            title={`Usa 1 Kit Riparazione: ripristina +${healAmount} HP all'Integrità del carretto (max ${player.hpMax} HP)`}
+          >
+            <Wrench size={16} className="text-amber-600"/> Ripara ({player.consumables.repairKits})
+          </button>
+
+          {/* Mouseover Info */}
+          <div className="absolute right-0 top-full mt-1.5 hidden group-hover:flex flex-col w-64 p-3 bg-stone-900 text-white rounded-xl shadow-xl z-50 pointer-events-none border border-stone-700">
+            <div className="flex items-center gap-1.5 font-bold text-amber-400 text-xs mb-1">
+              <Wrench size={14} /> Usa Kit di Riparazione
+            </div>
+            <p className="text-[11px] text-stone-200 leading-relaxed">
+              Consuma <strong>1 Kit Riparazione</strong> per ripristinare <strong>+{healAmount} HP</strong> all'Integrità del carretto (fino al massimo di {player.hpMax} HP).
+            </p>
+            {!isMechanic && (
+              <p className="text-[10px] text-stone-400 mt-1 italic">
+                * Con il badge "Meccanico Esperto" il recupero sale a +10 HP.
+              </p>
+            )}
+            <div className="mt-2 pt-2 border-t border-stone-700/80 text-[10px]">
+              {player.hp >= player.hpMax ? (
+                <span className="text-amber-300 font-semibold">⚠️ Integrità già al massimo ({player.hp}/{player.hpMax} HP).</span>
+              ) : player.consumables.repairKits === 0 ? (
+                <span className="text-rose-300 font-semibold">⚠️ Nessun kit disponibile (acquistabile all'Emporio).</span>
+              ) : (
+                <span className="text-emerald-400 font-semibold">✓ Clicca per riparare il carretto (+{healAmount} HP).</span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="relative group">
+          <button
+            onClick={() => {
+              const isSelected = itemDetail?.id === 'stat-oil';
+              setItemDetail(isSelected ? null : {
+                id: 'stat-oil',
+                name: 'Cariche Olio & Lanterna',
+                description: "L'Olio alimenta la Lanterna a Olio durante il viaggio: viene consumato automaticamente nelle tappe con Nebbia Fitta o Buio/Caverne per annullare ritardi (+0 Giorni) ed evitare imboscate. Non si consuma cliccando.",
+                category: 'stat',
+                icon: FlameKindling
+              });
+            }}
+            className={`flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-stone-50 rounded-lg text-xs font-bold border shadow-xs transition-all cursor-pointer ${
+              itemDetail?.id === 'stat-oil' ? 'ring-2 ring-sky-500 bg-sky-50/50 ' : ''
+            }${player.consumables.lanternOil === 0 ? 'text-rose-600 border-rose-200' : 'text-sky-700 border-stone-200'}`}
+            title="Cariche Olio Lanterna: clicca per visualizzare le informazioni d'uso nella scheda Info"
+          >
+            <FlameKindling size={16} /> Olio ({player.consumables.lanternOil})
+          </button>
+
+          {/* Mouseover Info */}
+          <div className="absolute right-0 top-full mt-1.5 hidden group-hover:flex flex-col w-72 p-3 bg-stone-900 text-white rounded-xl shadow-xl z-50 pointer-events-none border border-stone-700">
+            <div className="flex items-center gap-1.5 font-bold text-sky-400 text-xs mb-1">
+              <FlameKindling size={14} /> Cariche Olio Lanterna
+            </div>
+            <div className="space-y-1.5 text-[11px] text-stone-200 leading-relaxed">
+              <p>
+                <strong className="text-white">Cosa accade cliccando:</strong> apre la scheda informativa nella barra <em>Info</em> con i dettagli sulla Lanterna e le regole di consumo.
+              </p>
+              <p className="text-stone-300">
+                <strong className="text-white">Uso in viaggio:</strong> l'Olio <u>non si consuma al click</u>, ma viene utilizzato <strong>automaticamente</strong> dalla Lanterna quando si attraversano zone con <strong>Nebbia Fitta</strong> o <strong>Caverne/Buio</strong> per evitare ritardi (+1 giorno) ed imboscate.
+              </p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-stone-700/80 text-[10px]">
+              {!hasLantern ? (
+                <span className="text-amber-300 font-semibold">⚠️ Lanterna a Olio non acquistata (disponibile all'Emporio).</span>
+              ) : player.consumables.lanternOil === 0 ? (
+                <span className="text-rose-300 font-semibold">⚠️ Nessuna carica d'olio (acquistabile all'Emporio o dagli osti).</span>
+              ) : (
+                <span className="text-emerald-400 font-semibold">✓ {player.consumables.lanternOil} carica/he pronta/e all'uso automatico.</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

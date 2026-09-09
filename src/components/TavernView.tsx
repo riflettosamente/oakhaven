@@ -6,12 +6,11 @@ import { GameState } from '../types';
 
 interface TavernViewProps {
   onRestAtTavern: () => void;
-  onNavigate: (state: GameState) => void;
+  onNavigate?: (state: GameState) => void;
 }
 
 export const TavernView: React.FC<TavernViewProps> = ({
-  onRestAtTavern,
-  onNavigate
+  onRestAtTavern
 }) => {
   return (
     <motion.div 
@@ -63,12 +62,6 @@ export const TavernView: React.FC<TavernViewProps> = ({
             >
               <Smile size={18} />
               Riposa e Passa un Giorno (-2 Oro)
-            </button>
-            <button 
-              onClick={() => onNavigate('BOARD')}
-              className="w-full py-3.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              Torna alla Bacheca
             </button>
           </div>
         </div>

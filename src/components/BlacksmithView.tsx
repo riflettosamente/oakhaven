@@ -7,14 +7,13 @@ import { SHOP_ITEMS } from '../gameMechanics';
 
 interface BlacksmithViewProps {
   player: PlayerState;
-  onNavigate: (state: GameState) => void;
+  onNavigate?: (state: GameState) => void;
   buyUpgrade: (item: ShopItem) => void;
   sellUpgrade: (item: ShopItem) => void;
 }
 
 export const BlacksmithView: React.FC<BlacksmithViewProps> = ({
   player,
-  onNavigate,
   buyUpgrade,
   sellUpgrade
 }) => {
@@ -36,12 +35,6 @@ export const BlacksmithView: React.FC<BlacksmithViewProps> = ({
             <p className="text-stone-400 font-semibold uppercase text-xs tracking-wider mt-0.5">Miglioramenti strutturali e rinforzi per il carretto</p>
           </div>
         </div>
-        <button 
-          onClick={() => onNavigate('BOARD')} 
-          className="px-6 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold uppercase rounded-xl transition-all shadow-sm active:scale-95 border border-stone-300 cursor-pointer"
-        >
-          Torna alla Bacheca
-        </button>
       </div>
 
       <div className="space-y-4">

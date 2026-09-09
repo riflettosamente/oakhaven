@@ -8,9 +8,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { PixelCrate } from './components/PixelIcon';
 import GameManual from './components/GameManual';
-import { ItemDetailModal } from './components/ItemDetailModal';
-import { DepartureModal } from './components/DepartureModal';
+import { GatesView } from './components/GatesView';
+import { ExitView } from './components/ExitView';
 import { TopBar } from './components/TopBar';
+import { InfoBar } from './components/InfoBar';
+import { CityNavBar } from './components/CityNavBar';
 import { BoardView } from './components/BoardView';
 import { EmporioView } from './components/EmporioView';
 import { BlacksmithView } from './components/BlacksmithView';
@@ -114,12 +116,12 @@ export default function App() {
     setActiveStructure(null);
     setInspectedIcon(null);
     setCurrentQuest(null);
-    setDepartureConfirmationQuest(null);
+    setSelectedGateQuest(null);
     setGameState('START');
   };
 
   const [currentQuest, setCurrentQuest] = useState<Quest | null>(null);
-  const [departureConfirmationQuest, setDepartureConfirmationQuest] = useState<Quest | null>(null);
+  const [selectedGateQuest, setSelectedGateQuest] = useState<Quest | null>(null);
   const [questOptions, setQuestOptions] = useState<Quest[]>([]);
   const [journeyStep, setJourneyStep] = useState(0);
   const [log, setLog] = useState<{ 
@@ -394,11 +396,6 @@ export default function App() {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       if (e.code === 'Escape') {
-        if (departureConfirmationQuest !== null) {
-          e.preventDefault();
-          setDepartureConfirmationQuest(null);
-          return;
-        }
         if (inspectedIcon !== null) {
           e.preventDefault();
           setInspectedIcon(null);
@@ -448,7 +445,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, journeyStep, isRolling, activeEncounter, activeStructure, inspectedIcon, currentQuest, departureConfirmationQuest, stageHeroPhase, encounterResolved, revealedStageCards]);
+  }, [gameState, journeyStep, isRolling, activeEncounter, activeStructure, inspectedIcon, currentQuest, stageHeroPhase, encounterResolved, revealedStageCards]);
 
   const rewards = useMemo(() => {
     if (!currentQuest) return null;
@@ -956,7 +953,7 @@ export default function App() {
       destination: currentQuest.destination,
       weather,
       terrain,
-      weatherReport: { ...weatherReport, desc: weather.desc },
+      weatherReport: { ...weatherReport, desc: weather.desc, goodsLost: goodsLostWeather, motivation: weather.name },
       terrainReport: { ...terrainReport },
       structureData: structure,
       event: event.name !== 'Nessun Evento' ? `${event.name}: ${event.description}` : "",
@@ -1025,7 +1022,7 @@ export default function App() {
         armorMitigationNote,
         goodsLossNote,
         totalDaysPassed: player.daysPassed + totalDays,
-        weatherReport: { ...weatherReport, desc: weather.desc },
+        weatherReport: { ...weatherReport, desc: weather.desc, goodsLost: goodsLostWeather, motivation: weather.name },
         terrainReport,
         eventReport,
         structureReport,
@@ -1401,6 +1398,8 @@ export default function App() {
             ...l,
             totalDamage: newTotalDmg,
             detailedDamage: newDetailed,
+            goodsLost: (l.goodsLost || 0) + interactiveGoodsLost,
+            goodsLostEvent: ((l as any).goodsLostEvent || 0) + interactiveGoodsLost,
             goodsLostNote: updatedGoodsLossNote,
             eventReport: l.eventReport ? { 
               ...l.eventReport, 
@@ -1432,7 +1431,9 @@ export default function App() {
             ...next[journeyStep],
             totalDamage: newTotalDmg,
             detailedDamage: newDetailed,
-            goodsLostNote: updatedGoodsLossNote,
+            goodsLost: (next[journeyStep].goodsLost || 0) + interactiveGoodsLost,
+            goodsLostEvent: (next[journeyStep].goodsLostEvent || 0) + interactiveGoodsLost,
+            goodsLossNote: updatedGoodsLossNote,
             eventReport: { ...next[journeyStep].eventReport || {}, outcome: outcome }
           };
         }
@@ -1670,6 +1671,21 @@ export default function App() {
         />
       )}
 
+      {(['BOARD', 'EMPORIO', 'BLACKSMITH', 'TAVERN', 'GUILD', 'JOURNAL', 'GATES', 'EXIT'].includes(gameState) || (gameState === 'JOURNEY' && Boolean(itemDetail))) && (
+        <InfoBar
+          itemDetail={itemDetail}
+          player={player}
+          onClose={() => setItemDetail(null)}
+        />
+      )}
+
+      {['BOARD', 'EMPORIO', 'BLACKSMITH', 'TAVERN', 'GUILD', 'JOURNAL', 'GATES', 'EXIT'].includes(gameState) && (
+        <CityNavBar 
+          currentZone={gameState}
+          onNavigate={(zone) => setGameState(zone)}
+        />
+      )}
+
       <main className="flex-1 overflow-y-auto bg-stone-100/70 p-4 relative flex flex-col items-center custom-scrollbar gap-4">
         <AnimatePresence>
           {notification && (
@@ -1716,17 +1732,23 @@ export default function App() {
               questOptions={questOptions}
               currentTip={currentTip}
               onNavigate={setGameState}
-              onOpenDeparture={(q) => setDepartureConfirmationQuest(q)}
-              onOpenDepartureDirect={() => {
-                const q = departureConfirmationQuest || currentQuest || (questOptions.length > 0 ? questOptions[0] : null);
-                if (q) {
-                  setDepartureConfirmationQuest(q);
-                } else {
-                  setNotification("Nessun incarico disponibile al momento!");
-                  setTimeout(() => setNotification(null), 3000);
-                }
+              onOpenDeparture={(q) => {
+                setSelectedGateQuest(q);
+                setGameState('GATES');
               }}
-              onExitGame={resetGame}
+            />
+          )}
+
+          {gameState === 'GATES' && (
+            <GatesView 
+              player={player}
+              quest={selectedGateQuest || currentQuest || (questOptions.length > 0 ? questOptions[0] : null)}
+              questOptions={questOptions}
+              onSelectQuest={(q) => setSelectedGateQuest(q)}
+              onConfirmDeparture={(q) => {
+                acceptQuest(q);
+              }}
+              onNavigate={setGameState}
             />
           )}
 
@@ -1813,37 +1835,16 @@ export default function App() {
               onResetGame={resetGame} 
             />
           )}
+
+          {gameState === 'EXIT' && (
+            <ExitView 
+              player={player} 
+              onConfirmExit={resetGame} 
+              onNavigate={setGameState} 
+            />
+          )}
         </AnimatePresence>
       </main>
-
-      {/* Global Overlays */}
-      <AnimatePresence>
-        {itemDetail && (
-          <ItemDetailModal 
-            itemDetail={itemDetail} 
-            player={player} 
-            onClose={() => setItemDetail(null)} 
-          />
-        )}
-
-        {departureConfirmationQuest && (
-          <DepartureModal
-            quest={departureConfirmationQuest}
-            questOptions={questOptions}
-            player={player}
-            onClose={() => setDepartureConfirmationQuest(null)}
-            onSelectQuest={(q) => setDepartureConfirmationQuest(q)}
-            onConfirmDeparture={(quest) => {
-              setDepartureConfirmationQuest(null);
-              acceptQuest(quest);
-            }}
-            onNavigate={(state) => {
-              setDepartureConfirmationQuest(null);
-              setGameState(state);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
